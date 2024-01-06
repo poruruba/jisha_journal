@@ -5,7 +5,7 @@ const Response = require(HELPER_BASE + 'response');
 const Redirect = require(HELPER_BASE + 'redirect');
 
 const JISHA_FILE = __dirname + "/data/list.json";
-const PUBLIC_FOLDER = "jisha_journal";
+const PUBLIC_FOLDER = "";
 const PUBLIC_IMAGE_FOLDER = process.env.THIS_BASE_PATH + "/public/" + PUBLIC_FOLDER + "/images/";
 const GOOGLE_API_KEY = "【GoogleAPIキー】";
 const GOOGLE_API_GEO_URL = "https://maps.googleapis.com/maps/api/geocode/json";
