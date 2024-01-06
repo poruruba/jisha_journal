@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src * 'unsafe-inline'; media-src *; img-src * data: content: blob:;">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="css/start.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spinkit/2.0.1/spinkit.min.css" />
+  <script src="js/methods_bootstrap.js"></script>
+  <script src="js/components_bootstrap.js"></script>
+  <script src="js/components_utils.js"></script>
+  <script src="js/vue_utils.js"></script>
+  <script src="js/gql_utils.js"></script>
+
+  <script src="js/remoteconsole.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vconsole/dist/vconsole.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuex@3.x/dist/vuex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-router@3.x/dist/vue-router.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.3/leaflet.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.3/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <script src="dist/js/openlocationcode.min.js"></script>
+
+  <title>寺社の訪問記</title>
+</head>
+<body>
+<!--
+    <div id="loader-background">
+      <div class="sk-plane sk-center"></div>
+    </div>
+-->
+    <div id="top" class="container">
+      <div class="jumbotron">
+        <h2>寺社の訪問記</h2>
+      </div>
+
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#map" data-toggle="tab">マップ</a></li>
+        <li><a href="#management" data-toggle="tab">管理</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="map">
+          <br>
+          <div class="form-inline">
+            <label>都道府県</label> <select class="form-control" v-model="selected_pref" v-on:change="filter_jisha_list">
+              <option value="">フィルタしない</option>
+              <option v-for="(item, index) in prefecture_list" v-bind:value="item">{{item}}</option>
+            </select>
+            <label>name</label> <select class="form-control" v-model="selected_jisha" v-on:change="select_jisha">
+              <option value=""></option>
+              <option v-for="(item, index) in filtered_jisha_list" v-bind:value="item.id">{{item.name}} ({{item.address.pref}})</option>
+            </select>
+            <button class="btn btn-default btn-sm" v-on:click="select_jisha()">選択</button>
+          </div>
+          <br>
+          <div class="btn-block img-thumbnail" id="main_mapcontainer" style="height:60vh" class="img-thumbnail"></div>
+        </div>
+        <div class="tab-pane" id="management">
+          <br>
+          <button class="btn btn-default pull-right" v-on:click="start_register_jisha">新規登録</button>
+
+          <div class="form-inline">
+            <label>都道府県</label> <select class="form-control" v-model="selected_pref" v-on:change="filter_jisha_list">
+              <option value="">フィルタしない</option>
+              <option v-for="(item, index) in prefecture_list" v-bind:value="item">{{item}}</option>
+            </select>
+          </div>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>name<button class="btn btn-default btn-sm glyphicon glyphicon-arrow-down" v-on:click="filter_jisha_list_sort('name')"></button></th>
+                <th>address<button class="btn btn-default btn-sm glyphicon glyphicon-arrow-down" v-on:click="filter_jisha_list_sort('address')"></button></th>
+                <th>date<button class="btn btn-default btn-sm glyphicon glyphicon-arrow-down" v-on:click="filter_jisha_list_sort('date')"> </button></th>
+                <th>image</th><th>action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in filtered_jisha_list">
+                <td>{{index + 1}}</td>
+                <td><a v-if="item.url" v-bind:href="item.url" target="_blank">{{item.name}}</a><span v-if="!item.url">{{item.name}}</span></td>
+                <td>{{item.address.pref}} {{item.address.city}}</td><td>{{item.date}}</td>
+                <td>
+                  <button class="btn btn-default btn-sm" v-on:click="start_image_jisha(index)">Image</button>
+                </td>
+                <td>
+                  <button class="btn btn-default btn-sm" v-on:click="do_delete_jisha(item.id)">Delete</button>
+                  <button class="btn btn-default btn-sm" v-on:click="start_update_jisha(index)">Update</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+     
+      
+      <div class="modal" id="register_jishia_dialog">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <span v-if="register_jisha_params.type=='register'">
+                <h3 class="modal-title">新規登録
+                  <button class="btn btn-primary pull-right" v-on:click="do_register_jisha">登録</button></h3>
+              </span>
+              <span v-else-if="register_jisha_params.type=='update'">
+                <h3 class="modal-title">変更
+                  <button class="btn btn-primary pull-right" v-on:click="do_update_jisha">変更</button></h3>
+              </span>
+            </div>
+            <div class="modal-body">
+              <span v-if="register_jisha_params.type=='update'">
+                <label>id</label> {{register_jisha_params.id}}</br>
+              </span>
+              <label>name</label> <input type="text" class="form-control" v-model="register_jisha_params.name">
+              <div class="form-inline">
+                <label>location</label>
+                <button class="btn btn-default btn-sm glyphicon glyphicon-paperclip" v-on:click="paste_latlng"></button>
+                <label>lat</label> <input type="number" class="form-control" step="0.0000001" v-model.number="register_jisha_params.lat">
+                <label>lng</label> <input type="number" class="form-control" step="0.0000001" v-model.number="register_jisha_params.lng">
+              </div>
+              <div class="form-inline">
+                <label>date</label> <input type="date" class="form-control" v-model="register_jisha_params.date">
+              </div>
+              <label>url</label> <input type="url" class="form-control" v-model="register_jisha_params.url">
+              <div class="form-inline">
+                <label>image</label>
+                <comp_file id="image_file" v-bind:callback="file_selected" accept="image/*"></comp_file>
+              </div>
+              <label>memo</label>
+              <textarea class="form-control" v-model="register_jisha_params.memo" rows="2"></textarea>
+              <br>
+              <div class="btn-block img-thumbnail" id="mapcontainer" style="height:40vh" class="img-thumbnail"></div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" v-on:click="dialog_close('#register_jishia_dialog');">キャンセル</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="image_jishia_dialog">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">{{image_jisha.name}}</h3>
+            </div>
+            <div class="modal-body">
+              <label>id</label> {{image_jisha.id}}<br>
+              <center><img v-bind:src="image_jisha.image_url" class="img-thumbnail"></center>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" v-on:click="dialog_close('#image_jishia_dialog');">閉じる</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="info_jishia_dialog">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">{{info_jisha.name}}</h3>
+            </div>
+            <div class="modal-body">
+              <label>lat/lng</label> {{info_jisha.lat}} {{info_jisha.lng}} <a class="btn btn-default btn-sm" v-bind:href="'https://www.google.com/maps?q=' + info_jisha.lat + ',' + info_jisha.lng" target="_blank">GoogleMap</a><br>
+              <label>address</label> {{info_jisha.address?.pref}} {{info_jisha.address?.city}}<br>
+              <label>date</label> {{info_jisha.date}}<br>
+              <label>url</label> <a v-bind:href="info_jisha.url">{{info_jisha.url}}</a><br>
+              <label>memo</label>
+              <textarea class="form-control" v-model="register_jisha_params.memo" rows="2" readonly></textarea>
+              <br>
+              <center><img v-bind:src="info_jisha.image_url" class="img-thumbnail"></center>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" v-on:click="dialog_close('#info_jishia_dialog');">閉じる</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <router-view></router-view>
+    
+      <!-- for progress-dialog -->
+      <progress-dialog v-bind:title="progress_title"></progress-dialog>
+    </div>
+
+    <script src="js/store.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/start.js"></script>
+</body>
