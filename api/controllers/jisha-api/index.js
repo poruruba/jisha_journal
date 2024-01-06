@@ -5,9 +5,9 @@ const Response = require(HELPER_BASE + 'response');
 const Redirect = require(HELPER_BASE + 'redirect');
 
 const JISHA_FILE = __dirname + "/data/list.json";
-const PUBLIC_FOLDER = "";
+const PUBLIC_FOLDER = "jisha_journal";
 const PUBLIC_IMAGE_FOLDER = process.env.THIS_BASE_PATH + "/public/" + PUBLIC_FOLDER + "/images/";
-const GOOGLE_API_KEY = "yGoogleAPIƒL[z";
+const GOOGLE_API_KEY = "ã€GoogleAPIã‚­ãƒ¼ã€‘";
 const GOOGLE_API_GEO_URL = "https://maps.googleapis.com/maps/api/geocode/json";
 
 const dataurl = require('dataurl');
@@ -28,7 +28,7 @@ exports.handler = async (event, context, callback) => {
 		var index = list.findIndex(item => item.id == _id);
 		if( index >= 0 ){
 			var item = list[index];
-			var file_path = PUBLIC_IMAGE_FOLDER + "/images/" + item.fname;
+			var file_path = PUBLIC_IMAGE_FOLDER + item.fname;
 			await fs.unlink(file_path);
 			list.splice(index, 1);
 			await writeDataFile(list);
@@ -69,7 +69,7 @@ exports.handler = async (event, context, callback) => {
 		list.push(item);
 		await writeDataFile(list);
 
-		var file_path = PUBLIC_IMAGE_FOLDER + "/images/" + item.fname;
+		var file_path = PUBLIC_IMAGE_FOLDER + item.fname;
 		await fs.writeFile(file_path, image.data);
 		
 		return new Response({ id: item.id });
@@ -101,10 +101,10 @@ exports.handler = async (event, context, callback) => {
 		}
 		if( _dataurl !== undefined ){
 			var image = dataurl.parse(_dataurl);
-			var file_path = PUBLIC_IMAGE_FOLDER + "/images/" + item.fname;
+			var file_path = PUBLIC_IMAGE_FOLDER + item.fname;
 			await fs.unlink(file_path);
 			item.fname = item.id + "." + mime.extension(image.mimetype);
-			var new_file_path = PUBLIC_IMAGE_FOLDER + "/images/" + item.fname;
+			var new_file_path = PUBLIC_IMAGE_FOLDER + item.fname;
 			await fs.writeFile(new_file_path, image.data);
 		}
 		await writeDataFile(list);
