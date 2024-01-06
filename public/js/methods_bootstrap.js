@@ -25,7 +25,11 @@ const methods_bootstrap = {
         toastr[level](message, title, option);
     },
     clip_paste: async function(){
-    	return navigator.clipboard.readText();
+        try{
+        	return navigator.clipboard.readText();
+        }catch(error){
+            return prompt("入力してください。");
+        }
     },
     clip_copy: async function(text){
     	return navigator.clipboard.writeText(text);
