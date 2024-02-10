@@ -219,7 +219,8 @@ var vue_options = {
                 return;
             }
 
-            this.register_jisha_params.dataurl = await resize_image(files[0], MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
+            var dataurl = await resize_image(files[0], MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
+            this.$set(this.register_jisha_params, "dataurl", dataurl);
         },
 
         update_main_markers: async function(){
