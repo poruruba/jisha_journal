@@ -144,6 +144,7 @@
               <div class="form-inline">
                 <label>image</label>
                 <comp_file id="image_file" v-bind:callback="file_selected" accept="image/*"></comp_file>
+                <img v-bind:src="register_jisha_params.dataurl" class="img-thumbnail">
               </div>
               <label>memo</label>
               <textarea class="form-control" v-model="register_jisha_params.memo" rows="2"></textarea>
